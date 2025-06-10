@@ -9,7 +9,6 @@
 ### 필요한 라이브러리
 1. player
 2. pystray
-3. pillow
 4. requests
 5. screeninfo
-6. pystray
+7. pyqt5
