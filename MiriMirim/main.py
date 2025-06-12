@@ -1,23 +1,17 @@
-import threading, json, os
 from MiriMirim.alarm import *
 from MiriMirim.firstRun import *
 from MiriMirim.Program import *
-import MiriMirim.gui as gui
+
 alarm_interval = 30
 
 def startProgram(myInfo):
     global program
-    program = Program(myInfo)
-    tray_thread = threading.Thread(target=program.setup, daemon=True)
     alarm_thread = threading.Thread(target=alarm_function, args=(alarm_interval, notification_icon_path,), daemon=True)
     alarm_thread.start()
-    tray_thread.start()
-    program.main_program()
-
-    print("프로그램이 완전히 종료 중입니다.")
+    main_start(myInfo)
 
 def first_run():
-    gui.first_start()
+    first_start()
 
 if __name__ == "__main__":
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
@@ -35,8 +29,3 @@ if __name__ == "__main__":
         f = open(userInfoPath+"/myInfo.json", 'r')
         myInfo = json.loads(f.read())
         startProgram(myInfo)
-
-
-
-
-
