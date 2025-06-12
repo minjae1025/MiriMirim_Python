@@ -9,22 +9,24 @@ def startProgram(myInfo):
     alarm_thread.start()
     main_start(myInfo)
 
-def first_run():
-    first_start()
-
 if __name__ == "__main__":
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         bundle_dir = sys._MEIPASS
     else:
         bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
+
     userInfoPath = os.path.join(bundle_dir, "source/userInfo")
-    if len(os.listdir(userInfoPath)) == 0:
-        first_run()
+    if not os.path.isdir(userInfoPath):
+        os.mkdir(userInfoPath)
+
+    if os.path.isfile(userInfoPath + "/myInfo.json"):
         f = open(userInfoPath + "/myInfo.json", 'r')
         myInfo = json.loads(f.read())
         startProgram(myInfo)
     else:
-        f = open(userInfoPath+"/myInfo.json", 'r')
+        first_start()
+        f = open(userInfoPath + "/myInfo.json", 'r')
         myInfo = json.loads(f.read())
         startProgram(myInfo)
+

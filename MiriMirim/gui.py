@@ -84,7 +84,7 @@ class MainWindowClass(QMainWindow, mainUi) :
     # 창을 보여주는 함수
     def show_window(self):
         print("창을 표시합니다.")
-        self.showNormal()  # 윈도우를 일반 상태(최대화/최소화 아님)로 표시
+        self.showNormal()  # 윈도우를 일반 상태로 표시
         self.activateWindow()  # 윈도우 활성화
         self.raise_()  # 윈도우를 맨 앞으로 가져옵니다.
 
@@ -163,8 +163,4 @@ class MainWindowClass(QMainWindow, mainUi) :
         for row_idx, row_data in enumerate(self.my.Timetable):
             for col_idx, item_data in enumerate(row_data):
                 item = QTableWidgetItem(str(item_data))  # QTableWidgetItem 생성
-                table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정
-
-
-        # table_widget.resizeColumnsToContents()
-        # table_widget.resizeRowsToContents()
+                table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정\
