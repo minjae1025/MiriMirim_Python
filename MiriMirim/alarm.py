@@ -14,5 +14,5 @@ def alarm_function(interval_seconds, icon_path):
                 timeout=5
             )
         except Exception as e:
-            print(f"알림 실패: {e}")
+            print(f"알림 실패: {e} ")
         time.sleep(interval_seconds)

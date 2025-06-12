@@ -4,7 +4,7 @@ class Account():
     Name = ""
     myGrade = int
     myClass = int
-    Timetable = [[0 for _ in range(7)] for _ in range(5)]
+    Timetable = [["" for _ in range(5)] for _ in range(7)]
     workTimes = ["08:30", "09:30", "10:30", "11:30", "12:20", "13:20", "14:20", "15:20"]
 
     def __init__(self, myInfo):

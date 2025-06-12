@@ -1,6 +1,5 @@
-from MiriMirim.alarm import *
-from MiriMirim.firstRun import *
-from MiriMirim.Program import *
+from alarm import *
+from Program import *
 
 alarm_interval = 30
 
@@ -19,7 +18,7 @@ if __name__ == "__main__":
     else:
         bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
-    userInfoPath = os.path.join(bundle_dir, "../userInfo")
+    userInfoPath = os.path.join(bundle_dir, "source/userInfo")
     if len(os.listdir(userInfoPath)) == 0:
         first_run()
         f = open(userInfoPath + "/myInfo.json", 'r')

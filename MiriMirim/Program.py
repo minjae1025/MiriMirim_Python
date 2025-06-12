@@ -1,5 +1,4 @@
-from MiriMirim.gui import *
-import MiriMirim.gui as gui
+from gui import *
 
 def first_start():
     #QApplication : 프로그램을 실행시켜주는 클래스

@@ -1,4 +1,5 @@
 import datetime, requests, json
+from PyQt5.QtWidgets import QMessageBox
 
 today = datetime.date.today()
 API_KEY = "90de860d4ab54f7eb75640bf431149a4"
@@ -17,14 +18,18 @@ def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
         SEM = "1"
     api_url = (URL+"KEY="+API_KEY+"&ATPT_OFCDC_SC_CODE="+ATPT_OFCDC_SC_CODE+"&SD_SCHUL_CODE="+SD_SCHUL_CODE+"&AY="+AY+"&SEM="+SEM+"&ALL_TI_YMD="+ALL_TI_YMD+"&GRADE="+
                str(GRADE)+"&CLASS_NM="+str(CLASS_NM)+"&Type="+TYPE)
-    request = requests.get(api_url)
-    data = request.json()
-    print(api_url)
-    data = data["hisTimetable"][1]['row']
     subjects = []
-    for item in data:
-        temp = json.dumps(item["ITRT_CNTNT"])
-        subjects.append(temp.encode("utf8").decode('unicode_escape'))
+    try:
+        response = requests.get(api_url, timeout=1)
+        data = response.json()
+        print(api_url)
+        data = data["hisTimetable"][1]['row']
+
+        for item in data:
+            temp = json.dumps(item["ITRT_CNTNT"])
+            subjects.append(temp.encode("utf8").decode('unicode_escape'))
+    except:
+        return "error"
 
     return subjects
 

@@ -6,13 +6,27 @@ from PyQt5.QtCore import *
 from fileSys import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from MiriMirim.requestApi import requestApi
-from MiriMirim.Account import Account
+from requestApi import requestApi
+from Account import Account
 tray_icon = None
 
+img_path = 'source/img'
+gui_path = 'source/gui'
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    bundle_dir = sys._MEIPASS
+
+else:
+    bundle_dir = os.path.abspath(os.path.dirname(__file__))
+
+image_path = os.path.join(bundle_dir, img_path, 'miri_mirim.ico')
+notification_icon_path = image_path
+image = Image.open(image_path)
+
 #UI파일 연결
-firstUi = uic.loadUiType("../gui/firstWindow.ui")[0]
-mainUi = uic.loadUiType("../gui/mainWindow.ui")[0]
+#os.path.join(bundle_dir, '../gui', 'firstWindow.ui')
+firstUi = uic.loadUiType(os.path.join(bundle_dir, gui_path, 'firstWindow.ui'))[0]
+mainUi = uic.loadUiType(os.path.join(bundle_dir, gui_path, 'mainWindow.ui'))[0]
 
 #화면을 띄우는데 사용되는 Class 선언
 class firstWindowClass(QMainWindow, firstUi) :
@@ -20,7 +34,7 @@ class firstWindowClass(QMainWindow, firstUi) :
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('미리미림')
-        self.setWindowIcon(QIcon('../img/miri_mirim.ico'))
+        self.setWindowIcon(QIcon(image_path))
         self.setFixedSize(1600, 900)
 
 
@@ -46,7 +60,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.my = Account(myInfo)
         self.setupUi(self)
         self.setWindowTitle('미리미림')
-        self.setWindowIcon(QIcon('../img/miri_mirim.ico'))
+        self.setWindowIcon(QIcon(image_path))
         self.setFixedSize(1600, 900)
 
         self.button_group = QButtonGroup(self)
@@ -54,6 +68,18 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.button_group.addButton(self.btnSetting)
         self.button_group.addButton(self.btnMyInfo)
         self.button_group.setExclusive(True)  # 한 번에 하나의 버튼만 체크 가능
+
+        self.tabs.tabBar().hide()
+
+        self.btnMain.clicked.connect(lambda: self.tabs.setCurrentWidget(self.timetableWidget))
+        self.btnSetting.clicked.connect(lambda: self.tabs.setCurrentWidget(self.settingWidget))
+        self.btnMyInfo.clicked.connect(lambda: self.tabs.setCurrentWidget(self.myinfoWidget))
+
+        self.btnMain.setChecked(True)
+        self.tabs.setCurrentWidget(self.timetableWidget)
+
+        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     # 창을 보여주는 함수
     def show_window(self):
@@ -114,27 +140,31 @@ class MainWindowClass(QMainWindow, mainUi) :
             self.show_window()
 
     def main_program(self):
+        table_widget = self.timetable
         today = datetime.today()
         for i in range(0, 5):
             day = today + timedelta(days=-today.weekday()+i)
             j = 0
             try:
                 data = requestApi(day.strftime("%Y%m%d"), self.my.myGrade, self.my.myClass)
+                if data == "error":
+                    QMessageBox.critical(self, '인터넷 오류!', '인터넷이 오류로 인한 프로그램 실행에 실패했습니다. 프로그램을 종료합니다.')
+                    exit(1)
                 for item in data:
-                    self.my.Timetable[i][j] = item
+                    subject = item[1:-1]
+                    self.my.Timetable[j][i] = subject
                     j += 1
             except Exception as e:
                 print(e)
-                #tk.Label(frame, text=f"API 데이터 로딩 오류: {e}").pack()
 
         for item in self.my.Timetable:
             print(item)
 
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-    bundle_dir = sys._MEIPASS
-else:
-    bundle_dir = os.path.abspath(os.path.dirname(__file__))
+        for row_idx, row_data in enumerate(self.my.Timetable):
+            for col_idx, item_data in enumerate(row_data):
+                item = QTableWidgetItem(str(item_data))  # QTableWidgetItem 생성
+                table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정
 
-image_path = os.path.join(bundle_dir, '../img', 'miri_mirim.ico')
-notification_icon_path = image_path
-image = Image.open(image_path)
+
+        # table_widget.resizeColumnsToContents()
+        # table_widget.resizeRowsToContents()
