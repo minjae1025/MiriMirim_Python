@@ -11,7 +11,7 @@ if __name__ == "__main__":
         bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
 
-    userInfoPath = os.path.join(bundle_dir, "source/userInfo")
+    userInfoPath = os.path.join(bundle_dir, "source/user")
     if not os.path.isdir(userInfoPath):
         os.mkdir(userInfoPath)
 

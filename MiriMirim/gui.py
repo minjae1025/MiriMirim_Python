@@ -1,4 +1,4 @@
-import sys, os, threading
+import sys, os, threading, time
 from datetime import datetime, timedelta
 from PIL import Image
 from PyQt5 import uic
@@ -8,6 +8,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from requestApi import requestApi
 from Account import Account
+from plyer import notification
+from datetime import datetime
 tray_icon = None
 
 img_path = 'source/img'
@@ -55,14 +57,17 @@ class firstWindowClass(QMainWindow, firstUi) :
         self.close()
 
 class MainWindowClass(QMainWindow, mainUi) :
-    my = None
-    def __init__(self, my) :
+    def __init__(self, myInfo) :
         super().__init__()
-        self.my = my
+        self.my = Account(myInfo)
         self.setupUi(self)
         self.setWindowTitle('미리미림')
         self.setWindowIcon(QIcon(image_path))
         self.setFixedSize(1600, 900)
+
+        alarm_interval = 10
+        alarm_thread = threading.Thread(target=self.alarm_function, args=(alarm_interval, notification_icon_path,), daemon=True)
+        alarm_thread.start()
 
         self.button_group = QButtonGroup(self)
         self.button_group.addButton(self.btnMain)
@@ -75,12 +80,25 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnMain.clicked.connect(lambda: self.tabs.setCurrentWidget(self.timetableWidget))
         self.btnSetting.clicked.connect(lambda: self.tabs.setCurrentWidget(self.settingWidget))
         self.btnMyInfo.clicked.connect(lambda: self.tabs.setCurrentWidget(self.myinfoWidget))
-
         self.btnMain.setChecked(True)
-        self.tabs.setCurrentWidget(self.timetableWidget)
 
+        self.tabs.setCurrentWidget(self.timetableWidget)
+        self.timetable.itemChanged.connect(self.update_data)
         self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    def update_data(self, item: QTableWidgetItem):
+        row = item.row()
+        col = item.column()
+        new_value = item.text()
+
+        # 데이터 배열의 유효성 검사 (인덱스 범위 확인)
+        if 0 <= row < len(self.my.timeTable) and 0 <= col < len(self.my.timeTable[row]):
+            # 파이썬 배열 업데이트
+            self.my.timeTable[row][col] = new_value
+            print(f"데이터 업데이트: timetable[{row}][{col}] = '{self.my.timeTable[row][col]}'")
+        else:
+            print(f"Error: Row {row}, Col {col} out of bounds for data array.")
 
     # 창을 보여주는 함수
     def show_window(self):
@@ -147,7 +165,7 @@ class MainWindowClass(QMainWindow, mainUi) :
             day = today + timedelta(days=-today.weekday()+i)
             j = 0
             try:
-                data = requestApi(day.strftime("%Y%m%d"), self.my.myGrade, self.my.myClass)
+                data = requestApi(day, self.my.myGrade, self.my.myClass, )
                 if data == "error":
                     QMessageBox.critical(self, '인터넷 오류!', '인터넷이 오류로 인한 프로그램 실행에 실패했습니다. 프로그램을 종료합니다.')
                     exit(1)
@@ -158,7 +176,73 @@ class MainWindowClass(QMainWindow, mainUi) :
             except Exception as e:
                 print(e)
 
-        for row_idx, row_data in enumerate(self.my.timeTable):
-            for col_idx, item_data in enumerate(row_data):
-                item = QTableWidgetItem(str(item_data))  # QTableWidgetItem 생성
-                table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정\
+        try:
+            for row_idx, row_data in enumerate(self.my.timeTable):
+                for col_idx, item_data in enumerate(row_data):
+                        item = QTableWidgetItem(str(item_data))  # QTableWidgetItem 생성
+                        item.setTextAlignment(Qt.AlignCenter)
+                        table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정
+        except Exception as e:
+            print(f"시간표 출력중 에러 발생 : {e}")
+
+    def alarm_function(self, interval_seconds, icon_path):
+        today = datetime.today().weekday()
+        workTimes = self.my.getworkTimes()
+        row = 0
+        nextTimeIdx = 0
+        current_time = datetime.now().time()
+        if today == 0 or today == 4:
+            length = 7
+        elif today == 5 or today == 6:
+            notification.notify(
+                title='미리미림',
+                message=str(f"오늘은 주말입니다!"),
+                app_name='미리미림 알리미',
+                app_icon=icon_path,
+                timeout=5
+            )
+            return
+        else:
+            length = 8
+
+        for item in workTimes:
+            if datetime.strptime(item, "%H:%M").time() < current_time:
+                nextTimeIdx += 1
+                row += 1
+
+        while True:
+            today = datetime.today().weekday()
+            column = today
+            print(nextTimeIdx)
+            current_time = datetime.now().time()
+            print(current_time)
+            if nextTimeIdx < length:
+                parsed_time = datetime.strptime(workTimes[nextTimeIdx], "%H:%M").time()
+
+                if current_time > parsed_time:
+                    next = self.my.timeTable[row][column]
+                    if "*" in next or "프로그래밍" in next:
+                        subject = f"전공 수업인 {next}"
+                    elif "체육" in next or "운동" in next:
+                        subject = f"신나는 {next}"
+                    else:
+                        subject = f"{next}"
+                    try:
+                        if nextTimeIdx == 4:
+                            message = "곧 점심시간입니다!"
+                        else:
+                            message = f"다음 교시는 {subject}입니다. 미리 준비하세요!"
+                            row += 1
+
+                        notification.notify(
+                            title='미리미림',
+                            message=message,
+                            app_name='미리미림 알리미',
+                            app_icon=icon_path,
+                            timeout=5
+                        )
+                    except Exception as e:
+                        print(f"알림 실패: {e} ")
+                    nextTimeIdx += 1
+
+            time.sleep(interval_seconds)

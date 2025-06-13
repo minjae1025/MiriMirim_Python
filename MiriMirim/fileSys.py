@@ -9,7 +9,7 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
 else:
     bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
-file_path = os.path.join(bundle_dir, 'source/userInfo/myInfo.json')
+file_path = os.path.join(bundle_dir, 'source/user/myInfo.json')
 
 def save(userName, userGrade, userClass):
     myInfo = { 'userName': userName,

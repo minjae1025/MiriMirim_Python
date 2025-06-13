@@ -158,7 +158,7 @@ QPushButton#btnMyInfo {
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -178,8 +178,49 @@ QPushButton#btnMyInfo {
       </property>
       <property name="styleSheet">
        <string notr="true">QTableWidget {
-	border: 2px solid black;
+	border: 3px solid black;
+}
+
+QHeaderView::section {
+	border: 1px solid black;
+	font-size: 36px;
+	padding: 5px;
+	background-color: white;
+	font-weight: bold;
+ 	text-align: center;
+}
+
+QTableWidget::item {
+	font-size: 24px;
+	border: 1px solid black;
+}
+
+QTableWidget::item:selected{
+	background-color: lightgray;
+	color: black;
+
 }</string>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>false</bool>
+      </property>
+      <property name="dragDropOverwriteMode">
+       <bool>true</bool>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideNone</enum>
+      </property>
+      <property name="showGrid">
+       <bool>false</bool>
+      </property>
+      <property name="gridStyle">
+       <enum>Qt::SolidLine</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>false</bool>
       </property>
       <row>
        <property name="text">
@@ -241,6 +282,28 @@ QPushButton#btnMyInfo {
         <string>금</string>
        </property>
       </column>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>-10</y>
+        <width>1600</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Noto Sans KR</family>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>이번주 시간표</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="settingWidget">
