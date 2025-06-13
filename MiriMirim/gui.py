@@ -55,9 +55,10 @@ class firstWindowClass(QMainWindow, firstUi) :
         self.close()
 
 class MainWindowClass(QMainWindow, mainUi) :
-    def __init__(self, myInfo) :
+    my = None
+    def __init__(self, my) :
         super().__init__()
-        self.my = Account(myInfo)
+        self.my = my
         self.setupUi(self)
         self.setWindowTitle('미리미림')
         self.setWindowIcon(QIcon(image_path))
@@ -152,15 +153,12 @@ class MainWindowClass(QMainWindow, mainUi) :
                     exit(1)
                 for item in data:
                     subject = item[1:-1]
-                    self.my.Timetable[j][i] = subject
+                    self.my.timeTable[j][i] = subject
                     j += 1
             except Exception as e:
                 print(e)
 
-        for item in self.my.Timetable:
-            print(item)
-
-        for row_idx, row_data in enumerate(self.my.Timetable):
+        for row_idx, row_data in enumerate(self.my.timeTable):
             for col_idx, item_data in enumerate(row_data):
                 item = QTableWidgetItem(str(item_data))  # QTableWidgetItem 생성
                 table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정\

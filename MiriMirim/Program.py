@@ -1,4 +1,5 @@
 from gui import *
+from alarm import *
 
 def first_start():
     #QApplication : 프로그램을 실행시켜주는 클래스
@@ -15,12 +16,17 @@ def first_start():
     app.exec()
 
 def main_start(myInfo):
+    my = Account(myInfo)
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)  #마지막 윈도우가 닫혀도 앱 종료 안 함 (트레이 유지)
-    mainWindow = MainWindowClass(myInfo)
+    mainWindow = MainWindowClass(my)
     mainWindow.show()  # 메인 윈도우 표시
     mainWindow.setup_tray_icon()
     mainWindow.main_program()
+
+    alarm_interval = 10
+    alarm_thread = threading.Thread(target=alarm_function, args=(alarm_interval, notification_icon_path, my,), daemon=True)
+    alarm_thread.start()
 
     app.exec()
 

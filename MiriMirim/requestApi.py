@@ -20,7 +20,7 @@ def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
                str(GRADE)+"&CLASS_NM="+str(CLASS_NM)+"&Type="+TYPE)
     subjects = []
     try:
-        response = requests.get(api_url, timeout=1)
+        response = requests.get(api_url, timeout=5)
         data = response.json()
         print(api_url)
         data = data["hisTimetable"][1]['row']

@@ -134,7 +134,7 @@ QPushButton#btnMyInfo {
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>side_logo.png</pixmap>
+     <pixmap>../img/side_logo.png</pixmap>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

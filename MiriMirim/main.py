@@ -1,12 +1,7 @@
-from alarm import *
 from Program import *
-
-alarm_interval = 30
 
 def startProgram(myInfo):
     global program
-    alarm_thread = threading.Thread(target=alarm_function, args=(alarm_interval, notification_icon_path,), daemon=True)
-    alarm_thread.start()
     main_start(myInfo)
 
 if __name__ == "__main__":
