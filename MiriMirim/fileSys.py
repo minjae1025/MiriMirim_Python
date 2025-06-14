@@ -1,27 +1,42 @@
 import json, sys, os
 
-# userName = input("이름 입력: ")
-# userGrade = input("학년 입력: ")
-# userClass = input("반 입력: ")
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     bundle_dir = sys._MEIPASS
 
 else:
     bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
-file_path = os.path.join(bundle_dir, 'source/user/myInfo.json')
+user_path = os.path.join(bundle_dir, 'source/user/')
 
-def save(userName, userGrade, userClass):
+def myinfoSave(userName, userGrade, userClass):
     myInfo = { 'userName': userName,
                'userGrade': userGrade,
                'userClass': userClass
                }
-    f = open(file_path, 'w')
+    f = open(user_path+'myInfo.json', 'w')
     f.write(json.dumps(myInfo))
     f.close()
 
-def load():
-    f = open(file_path, 'r')
+def myinfoLoad():
+    f = open(user_path+'myInfo.json', 'r')
     myInfo = json.loads(f.read())
     print(myInfo)
     return myInfo
+
+def settingLoad():
+    if os.path.isfile(user_path+'settings.json'):
+        f = open(user_path + 'settings.json', 'r')
+        settings = json.loads(f.read())
+        return settings
+    else:
+        return {
+            'dark' : False,
+            'alarm' : True,
+            'background' : True
+        }
+
+def settingSave(settings):
+    f = open(user_path+'settings.json', 'w')
+    f.write(json.dumps(settings))
+    f.close()
+    return True

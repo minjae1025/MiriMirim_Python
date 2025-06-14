@@ -14,15 +14,12 @@ def first_start():
     #프로그램을 이벤트루프로 진입시키는 코드
     app.exec()
 
-def main_start(myInfo):
+def main_start(myInfo, sttrings):
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)  #마지막 윈도우가 닫혀도 앱 종료 안 함 (트레이 유지)
-    mainWindow = MainWindowClass(myInfo)
-    mainWindow.show()  # 메인 윈도우 표시
-    mainWindow.setup_tray_icon()
-    mainWindow.main_program()
+    mainWindow = MainWindowClass(myInfo, sttrings)
+    timetable = threading.Thread(target=mainWindow.show_timetable, daemon=True)
+    timetable.start()
+    mainWindow.show()
 
     app.exec()
-
-
-

@@ -1,0 +1,117 @@
+QPushButton#btnMain, QPushButton#btnMyInfo, QPushButton#btnSetting {
+	background-color: #D9D9D9;
+	color: black;
+	border: 1.5px solid black;
+	border-right: none;
+	border-bottom: none;
+	padding: 10px 20px;
+	font-size: 24px;
+	font-weight: bold;
+}
+QPushButton#btnMain:hover, QPushButton#btnMyInfo:hover, QPushButton#btnSetting:hover {
+    background-color: #B9B9B9;
+}
+QPushButton#btnMain:checked, QPushButton#btnMyInfo:checked, QPushButton#btnSetting:checked {
+	background-color: #08F28C; /* 민트색 */
+}
+
+QPushButton#btnMyInfo {
+	border-right: 1.5px solid black;
+}
+
+QTabWidget::pane {
+	border-top: 1.5px solid black;
+	background-color: #F9F9F9;
+}
+
+QTableWidget {
+	border: 3px solid black;
+	border-radius: 5px;
+}
+
+QHeaderView::section {
+	border: 1px solid black;
+	font-size: 36px;
+	padding: 5px;
+	background-color: white;
+	font-weight: bold;
+ 	text-align: center;
+}
+
+QTableWidget::item {
+	font-size: 24px;
+	border: 1px solid black;
+}
+
+QTableWidget::item:selected{
+	background-color: lightgray;
+	color: black;
+}
+
+QTableCornerButton::section {
+	border: 1px solid black;
+	background-color: white;
+}
+
+QWidget#settingTitle {
+    border: 1.5px solid black;
+    background-color: white;
+    border-radius: 20px;
+}
+
+QPushButton#btnSettingDefault, QPushButton#btnSettingSave {
+    border: 1px solid black;
+    background-color: #EEEEEE;
+    border-radius: 10px;
+}
+
+QPushButton#btnSettingDefault:hover, QPushButton#btnSettingSave:hover {
+    border: 1px solid black;
+    background-color: #DDDDDD;
+    border-radius: 10px;
+}
+
+QCheckBox#alarm, QCheckBox#background, QCheckBox#darkmode {
+    spacing: 10px; /* 체크박스와 텍스트 사이 간격 */
+    padding: 2px;
+}
+
+QCheckBox#alarm::indicator, QCheckBox#background::indicator, QCheckBox#darkmode::indicator {
+    width: 40px;
+    height: 40px;
+	border: 1px solid gray;
+	border-radius: 10px;
+}
+
+QCheckBox#alarm:hover, QCheckBox#background:hover, QCheckBox#darkmode:hover {
+    color: green;
+}
+
+QCheckBox#alarm::indicator:unchecked,
+QCheckBox#background::indicator:unchecked,
+QCheckBox#darkmode::indicator:unchecked {
+}
+
+QCheckBox#alarm::indicator:checked,
+QCheckBox#background::indicator:checked,
+QCheckBox#darkmode::indicator:checked {
+	image: url(source/img/check.png);
+}
+
+QWidget#myinfoWidget {
+    background-color: white;
+    border: 1.5px solid black;
+    border-radius: 15px;
+}
+
+QPushButton#btnSaveMyinfo, QPushButton#btnCancelMyinfo {
+    border: 1px solid black;
+    background-color: #EEEEEE;
+    border-radius: 10px;
+}
+
+QPushButton#btnSaveMyinfo:hover, QPushButton#btnCancelMyinfo:hover {
+    border: 1px solid black;
+    background-color: #DDDDDD;
+    border-radius: 10px;
+}

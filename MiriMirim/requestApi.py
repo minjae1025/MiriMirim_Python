@@ -23,7 +23,7 @@ def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
                str(GRADE)+"&CLASS_NM="+str(CLASS_NM)+"&Type="+TYPE)
     subjects = []
     try:
-        response = requests.get(api_url, timeout=5)
+        response = requests.get(api_url, timeout=3)
         data = response.json()
         print(api_url)
         data = data["hisTimetable"][1]['row']
@@ -39,10 +39,3 @@ def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
         return "error"
 
     return subjects
-
-# data = requestApi()
-# print(today.strftime("%Y년 %m월 %d일")+" 시간표")
-# for item in data:
-#     test = json.dumps(item["ITRT_CNTNT"])
-#     print(test.encode("utf8").decode('unicode_escape'))
-

@@ -7,40 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>1600</width>
-    <height>927</height>
+    <height>930</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <property name="styleSheet">
-    <string notr="true">QPushButton {
-	background-color: #D9D9D9;
-	color: black;
-	border: 1.5px solid black;
-	border-right: none;
-	border-bottom: none;
-	padding: 10px 20px;
-	font-size: 24px;
-	font-weight: bold;
-}
-QPushButton:hover {
-	background-color: #e0e0e0;
-}
-QPushButton:checked { /* 선택된 탭처럼 보이게 하려면 */
-	background-color: #08F28C; /* 민트색 */
-}
-
-QPushButton#BtnMyInfo { /* 마지막 버튼의 objectName이 'lastButton'이라고 가정 */
-    border-right: 1.5px solid black;
-}
-
-QPushButton#btnMyInfo {
-    border-right: 1.5px solid black;
-}</string>
-   </property>
    <widget class="QPushButton" name="btnMyInfo">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1400</x>
@@ -52,13 +29,9 @@ QPushButton#btnMyInfo {
     <property name="font">
      <font>
       <family>Noto Sans KR</family>
-      <pointsize>-1</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
     </property>
     <property name="text">
      <string>내 정보</string>
@@ -79,13 +52,9 @@ QPushButton#btnMyInfo {
     <property name="font">
      <font>
       <family>Noto Sans KR</family>
-      <pointsize>-1</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
     </property>
     <property name="text">
      <string>설정</string>
@@ -106,13 +75,9 @@ QPushButton#btnMyInfo {
     <property name="font">
      <font>
       <family>Noto Sans KR</family>
-      <pointsize>-1</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
     </property>
     <property name="text">
      <string>시간표</string>
@@ -121,7 +86,7 @@ QPushButton#btnMyInfo {
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="logoLabel">
+   <widget class="QLabel" name="sideLogo">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -132,9 +97,6 @@ QPushButton#btnMyInfo {
     </property>
     <property name="text">
      <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>../img/side_logo.png</pixmap>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -150,15 +112,13 @@ QPushButton#btnMyInfo {
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">QTabWidget::pane {
-	border-top: 1.5px solid black;
-}</string>
+     <string notr="true"/>
     </property>
     <property name="tabShape">
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -170,36 +130,14 @@ QPushButton#btnMyInfo {
      <widget class="QTableWidget" name="timetable">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>150</x>
         <y>60</y>
-        <width>1200</width>
+        <width>1300</width>
         <height>780</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">QTableWidget {
-	border: 3px solid black;
-}
-
-QHeaderView::section {
-	border: 1px solid black;
-	font-size: 36px;
-	padding: 5px;
-	background-color: white;
-	font-weight: bold;
- 	text-align: center;
-}
-
-QTableWidget::item {
-	font-size: 24px;
-	border: 1px solid black;
-}
-
-QTableWidget::item:selected{
-	background-color: lightgray;
-	color: black;
-
-}</string>
+       <string notr="true"/>
       </property>
       <property name="tabKeyNavigation">
        <bool>false</bool>
@@ -283,7 +221,7 @@ QTableWidget::item:selected{
        </property>
       </column>
      </widget>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="tableLabel">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -310,36 +248,634 @@ QTableWidget::item:selected{
      <attribute name="title">
       <string>2</string>
      </attribute>
-     <widget class="QLabel" name="label_3">
+     <widget class="QWidget" name="settingTitle" native="true">
       <property name="geometry">
        <rect>
         <x>450</x>
-        <y>340</y>
-        <width>151</width>
-        <height>71</height>
+        <y>125</y>
+        <width>700</width>
+        <height>600</height>
        </rect>
       </property>
-      <property name="text">
-       <string>셋팅</string>
-      </property>
+      <widget class="QWidget" name="setting" native="true">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>80</y>
+         <width>600</width>
+         <height>400</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <widget class="QWidget" name="verticalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>601</width>
+          <height>401</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="background">
+           <property name="font">
+            <font>
+             <family>Noto Sans KR</family>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>백그라운드 실행 허용</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="tristate">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="darkmode">
+           <property name="font">
+            <font>
+             <family>Noto Sans KR</family>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>다크모드</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <property name="tristate">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="alarm">
+           <property name="font">
+            <font>
+             <family>Noto Sans KR</family>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>알람 허용</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="tristate">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="btnSettingSave">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>480</y>
+         <width>295</width>
+         <height>70</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Sans KR</family>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>저장</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnSettingDefault">
+       <property name="geometry">
+        <rect>
+         <x>355</x>
+         <y>480</y>
+         <width>295</width>
+         <height>70</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Sans KR</family>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>기본값</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelSetting">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>40</y>
+         <width>700</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Sans KR</family>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>설정은 프로그램 재실행 시 적용됩니다</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="myinfoWidget">
      <attribute name="title">
       <string>3</string>
      </attribute>
-     <widget class="QLabel" name="label_4">
+     <widget class="QWidget" name="myinfoTitle" native="true">
       <property name="geometry">
        <rect>
-        <x>530</x>
-        <y>340</y>
-        <width>171</width>
-        <height>71</height>
+        <x>450</x>
+        <y>110</y>
+        <width>700</width>
+        <height>620</height>
        </rect>
       </property>
-      <property name="text">
-       <string>마이인포</string>
-      </property>
+      <widget class="QWidget" name="editWidget" native="true">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>120</y>
+         <width>560</width>
+         <height>300</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0" columnstretch="0">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="0">
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="classGroup">
+              <property name="font">
+               <font>
+                <family>Noto Sans KR</family>
+                <pointsize>11</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="title">
+               <string>학년</string>
+              </property>
+              <widget class="QComboBox" name="gradeCombo">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>50</y>
+                 <width>480</width>
+                 <height>50</height>
+                </rect>
+               </property>
+               <property name="palette">
+                <palette>
+                 <active>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </active>
+                 <inactive>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </inactive>
+                 <disabled>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </disabled>
+                </palette>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Noto Sans KR</family>
+                 <pointsize>12</pointsize>
+                 <strikeout>false</strikeout>
+                </font>
+               </property>
+               <property name="mouseTracking">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>학년</string>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="accessibleName">
+                <string>학년</string>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border: 3px solid #08F28C;
+
+</string>
+               </property>
+               <property name="inputMethodHints">
+                <set>Qt::ImhNone</set>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+               <item>
+                <property name="text">
+                 <string>학년</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>3</string>
+                </property>
+               </item>
+              </widget>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QGroupBox" name="gradeGroup">
+              <property name="font">
+               <font>
+                <family>Noto Sans KR</family>
+                <pointsize>11</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="title">
+               <string>반</string>
+              </property>
+              <widget class="QComboBox" name="classCombo">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>50</y>
+                 <width>480</width>
+                 <height>50</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="palette">
+                <palette>
+                 <active>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </active>
+                 <inactive>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </inactive>
+                 <disabled>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>255</red>
+                     <green>255</green>
+                     <blue>255</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </disabled>
+                </palette>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Noto Sans KR</family>
+                 <pointsize>12</pointsize>
+                 <strikeout>false</strikeout>
+                </font>
+               </property>
+               <property name="mouseTracking">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>학년</string>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="accessibleName">
+                <string>학년</string>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border: 3px solid #08F28C;
+
+</string>
+               </property>
+               <property name="inputMethodHints">
+                <set>Qt::ImhNone</set>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+               <item>
+                <property name="text">
+                 <string>반</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>3</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>4</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>5</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>6</string>
+                </property>
+               </item>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QLabel" name="labelMy">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>40</y>
+         <width>700</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Sans KR</family>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>안녕하세요 ###님! 좋은 하루 보내세요!</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnSaveMyinfo">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>420</y>
+         <width>275</width>
+         <height>70</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Sans KR</family>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>저장</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnCancelMyinfo">
+       <property name="geometry">
+        <rect>
+         <x>355</x>
+         <y>420</y>
+         <width>275</width>
+         <height>70</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Noto Sans KR</family>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>취소</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>

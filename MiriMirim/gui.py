@@ -2,7 +2,7 @@ import sys, os, threading, time
 from datetime import datetime, timedelta
 from PIL import Image
 from PyQt5 import uic
-from PyQt5.QtCore import *
+from PyQt5.QtCore import Qt, QCoreApplication, QFile, QTextStream
 from fileSys import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -14,12 +14,6 @@ tray_icon = None
 
 img_path = 'source/img'
 gui_path = 'source/gui'
-
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-    bundle_dir = sys._MEIPASS
-
-else:
-    bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
 image_path = os.path.join(bundle_dir, img_path, 'miri_mirim.ico')
 notification_icon_path = image_path
@@ -39,7 +33,6 @@ class firstWindowClass(QMainWindow, firstUi) :
         self.setWindowIcon(QIcon(image_path))
         self.setFixedSize(1600, 900)
 
-
     def start(self) :
         userName = self.nameText.text()
         userGrade = self.gradeCombo.currentText()
@@ -49,25 +42,28 @@ class firstWindowClass(QMainWindow, firstUi) :
             QMessageBox.warning(self, '미리미림', '이름을 입력해주세요!')
             return
         if userGrade == '학년' or userClass == '반':
-            #print("학년과 반을 선택해 주세요")
             QMessageBox.warning(self, '미리미림', '학년과 반을 선택해 주세요')
             return
 
-        save(userName, userGrade, userClass)
+        myinfoSave(userName, userGrade, userClass)
         self.close()
 
 class MainWindowClass(QMainWindow, mainUi) :
-    def __init__(self, myInfo) :
+    def __init__(self, myInfo, settings) :
         super().__init__()
-        self.my = Account(myInfo)
+        self.my = Account(myInfo, settings)
         self.setupUi(self)
         self.setWindowTitle('미리미림')
         self.setWindowIcon(QIcon(image_path))
         self.setFixedSize(1600, 900)
 
-        alarm_interval = 10
-        alarm_thread = threading.Thread(target=self.alarm_function, args=(alarm_interval, notification_icon_path,), daemon=True)
-        alarm_thread.start()
+        if (self.my.settings['background']):
+            self.setup_tray_icon()
+
+        if (self.my.settings['alarm']):
+            alarm_interval = 10
+            alarm_thread = threading.Thread(target=self.alarm_function, args=(alarm_interval, notification_icon_path,),daemon=True)
+            alarm_thread.start()
 
         self.button_group = QButtonGroup(self)
         self.button_group.addButton(self.btnMain)
@@ -82,10 +78,79 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnMyInfo.clicked.connect(lambda: self.tabs.setCurrentWidget(self.myinfoWidget))
         self.btnMain.setChecked(True)
 
+        self.btnSettingSave.clicked.connect(self.apply_setting)
+        self.btnSettingDefault.clicked.connect(self.set_default)
+
+        img_path = os.path.join(bundle_dir, 'source/img/')
+        if (self.my.settings['dark']):
+            pixmap = QPixmap(img_path+'dark_side_logo.png')
+            self.sideLogo.setPixmap(pixmap)
+            self.apply_stylesheet("dark.qss")
+        else:
+            pixmap = QPixmap(img_path+'light_side_logo.png')
+            self.sideLogo.setPixmap(pixmap)
+            self.apply_stylesheet("light.qss")
+
+        self.set_setting_btn()
+
+        self.darkmode.setTristate(False)
+        self.alarm.setTristate(False)
+        self.background.setTristate(False)
+
         self.tabs.setCurrentWidget(self.timetableWidget)
         self.timetable.itemChanged.connect(self.update_data)
         self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    def set_setting_btn(self) :
+        self.darkmode.setChecked(self.my.settings['dark'])
+        self.alarm.setChecked(self.my.settings['alarm'])
+        self.background.setChecked(self.my.settings['background'])
+
+    def set_default(self):
+        default = QMessageBox.warning(self, '미리미림', '정말 기본값으로 하시겠습니까?', QMessageBox.Yes | QMessageBox.No)
+        if default == QMessageBox.Yes:
+            settings = {
+            'dark' : False,
+            'alarm' : True,
+            'background' : True
+            }
+
+            self.my.setSettings(settings)
+            save = settingSave(settings)
+            self.set_setting_btn()
+
+            if save:
+                QMessageBox.about(self, '미리미림', '기본값으로 저장 성공!')
+            else:
+                QMessageBox.critical(self, '미리미림', '기본값으로 저장 실패! 관리자에게 문의하세요.')
+
+
+    def apply_setting(self):
+        settings = {
+            'dark': self.darkmode.isChecked(),
+            'alarm': self.alarm.isChecked(),
+            'background': self.background.isChecked()
+        }
+
+        self.my.setSettings(settings)
+        save = settingSave(settings)
+
+        if save:
+            QMessageBox.about(self, '미리미림', '설정 저장 성공!')
+        else:
+            QMessageBox.critical(self, '미리미림', '설정 저장 실패! 관리자에게 문의하세요.')
+
+    def apply_stylesheet(self, filename):
+        path = os.path.join(bundle_dir, 'source/gui/')
+        file = QFile(path+filename)
+        if not file.open(QFile.ReadOnly | QFile.Text):
+            print(f"Error: Could not open stylesheet file: {filename}")
+            return
+        stream = QTextStream(file)
+        stylesheet = stream.readAll()
+        self.centralwidget.setStyleSheet(stylesheet)  # QApplication에 스타일 시트 적용
+        file.close()
 
     def update_data(self, item: QTableWidgetItem):
         row = item.row()
@@ -118,10 +183,19 @@ class MainWindowClass(QMainWindow, mainUi) :
             tray_icon.hide() # 트레이 아이콘 숨기기
         QCoreApplication.quit() # PyQt 애플리케이션 종료
 
-    def closeEvent(self, event):
+    def closeEvent(self, closeEvent):
         print("윈도우 닫기 이벤트 감지.")
-        self.hide_window()  # 윈도우를 숨깁니다.
-        event.ignore() # 창을 숨김
+        if (self.my.settings['background']):
+            self.hide_window()  # 윈도우를 숨깁니다.
+            closeEvent.ignore()
+        else:
+            re = QMessageBox.question(self, "미리미림", "종료 하시겠습니까?")
+            if re == QMessageBox.Yes:
+                print("프로그램을 종료합니다.")
+                exit(1)
+            else:
+                closeEvent.ignore()
+
 
     def setup_tray_icon(self):
         global tray_icon
@@ -158,23 +232,31 @@ class MainWindowClass(QMainWindow, mainUi) :
         if reason == QSystemTrayIcon.Trigger:
             self.show_window()
 
-    def main_program(self):
-        table_widget = self.timetable
+    def try_timetable_request(self):
         today = datetime.today()
         for i in range(0, 5):
-            day = today + timedelta(days=-today.weekday()+i)
+            day = today + timedelta(days=-today.weekday() + i)
             j = 0
             try:
                 data = requestApi(day, self.my.myGrade, self.my.myClass, )
                 if data == "error":
-                    QMessageBox.critical(self, '인터넷 오류!', '인터넷이 오류로 인한 프로그램 실행에 실패했습니다. 프로그램을 종료합니다.')
-                    exit(1)
+                    retry = QMessageBox.critical(self, '인터넷 오류!', '인터넷이 오류로 인한 프로그램 실행에 실패했습니다. 재시도 하시겠습니까?',
+                                                 QMessageBox.YES | QMessageBox.NO)
+                    if retry == QMessageBox.Yes:
+                        return False
                 for item in data:
                     subject = item[1:-1]
                     self.my.timeTable[j][i] = subject
                     j += 1
             except Exception as e:
                 print(e)
+        return True
+
+    def show_timetable(self):
+        table_widget = self.timetable
+        while True:
+            if self.try_timetable_request():
+                break
 
         try:
             for row_idx, row_data in enumerate(self.my.timeTable):
@@ -182,6 +264,7 @@ class MainWindowClass(QMainWindow, mainUi) :
                         item = QTableWidgetItem(str(item_data))  # QTableWidgetItem 생성
                         item.setTextAlignment(Qt.AlignCenter)
                         table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정
+
         except Exception as e:
             print(f"시간표 출력중 에러 발생 : {e}")
 
@@ -191,16 +274,17 @@ class MainWindowClass(QMainWindow, mainUi) :
         row = 0
         nextTimeIdx = 0
         current_time = datetime.now().time()
+        notification.notify(
+            title='미리미림',
+            message=str(f"오늘은 {self.my.weekdays[today]}요일 입니다!"),
+            app_name='미리미림 알리미',
+            app_icon=icon_path,
+            timeout=5
+        )
+
         if today == 0 or today == 4:
             length = 7
         elif today == 5 or today == 6:
-            notification.notify(
-                title='미리미림',
-                message=str(f"오늘은 주말입니다!"),
-                app_name='미리미림 알리미',
-                app_icon=icon_path,
-                timeout=5
-            )
             return
         else:
             length = 8
