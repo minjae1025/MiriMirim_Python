@@ -10,6 +10,8 @@ SD_SCHUL_CODE = "7011569"
 TYPE = "json"
 AY = str(today.year)
 SEM = ""
+majorSubjects = ['프로그래밍', '컴퓨터', '웹사이트', '네트워크', '서버', '데이터베이스', 'SQL', 'UI', '디자인', '광고', '그래픽', 'CG',
+                                 '색채', '비주얼', 'UX', '콘텐츠']
 
 
 def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
@@ -30,9 +32,13 @@ def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
         i = 1
         for item in data:
             if day.weekday() == 4 and (i == 5 or i == 6):
-                temp = "'선택 과목'"
+                temp = "선택 과목"
             else:
-                temp = json.dumps(item["ITRT_CNTNT"]).encode("utf8").decode('unicode_escape')
+                temp = json.dumps(item["ITRT_CNTNT"]).encode("utf8").decode('unicode_escape')[1:-1]
+                if any(sub_string in temp for sub_string in majorSubjects):
+                    if not '*' in temp:
+                        temp = '* '+temp
+
             subjects.append(temp)
             i+=1
     except:

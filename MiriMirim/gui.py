@@ -97,26 +97,81 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.alarm.setTristate(False)
         self.background.setTristate(False)
 
+        self.background.stateChanged.connect(self.change_value)
+        self.alarm.stateChanged.connect(self.change_value)
+        self.darkmode.stateChanged.connect(self.change_value)
+
         self.tabs.setCurrentWidget(self.timetableWidget)
         self.timetable.itemChanged.connect(self.update_data)
         self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
+        self.gradeCombo.setCurrentIndex(self.my.getmyGrade()-1)
+        self.classCombo.setCurrentIndex(self.my.getmyClass()-1)
+        self.gradeCombo.setEnabled(False)
+        self.classCombo.setEnabled(False)
+        self.btnCancelMyinfo.setEnabled(False)
+
+        self.myLabel.setText(f"안녕하세요 {self.my.Name}님! 좋은 {self.my.weekdays[datetime.today().weekday()]}요일 보내세요!")
+        self.btnSaveMyinfo.clicked.connect(self.set_myinfo)
+        self.btnSaveMyinfo.setEnabled(False)
+        self.btnEditMyinfo.clicked.connect(self.edit_myinfo)
+        self.btnCancelMyinfo.setEnabled(False)
+        self.btnCancelMyinfo.clicked.connect(self.cancel_myinfo)
+
+    def change_value(self):
+        self.btnSettingSave.setEnabled(True)
+
+    def cancel_myinfo(self):
+        self.gradeCombo.setCurrentIndex(self.my.getmyGrade() - 1)
+        self.classCombo.setCurrentIndex(self.my.getmyClass() - 1)
+        self.gradeCombo.setEnabled(False)
+        self.classCombo.setEnabled(False)
+        self.btnSaveMyinfo.setEnabled(False)
+        self.btnEditMyinfo.setEnabled(True)
+        self.btnCancelMyinfo.setEnabled(False)
+
+    def edit_myinfo(self):
+        self.gradeCombo.setEnabled(True)
+        self.classCombo.setEnabled(True)
+        self.btnSaveMyinfo.setEnabled(True)
+        self.btnEditMyinfo.setEnabled(False)
+        self.btnCancelMyinfo.setEnabled(True)
+
+    def set_myinfo(self):
+        userGrade = self.gradeCombo.currentText()
+        userClass = self.classCombo.currentText()
+        save = myinfoSave(self.my.Name, userGrade, userClass)
+        self.my.userGrade = userGrade
+        self.my.userClass = userClass
+
+        self.try_timetable_request()
+        self.gradeCombo.setEnabled(False)
+        self.classCombo.setEnabled(False)
+        self.btnSaveMyinfo.setEnabled(False)
+        self.btnEditMyinfo.setEnabled(True)
+        self.btnCancelMyinfo.setEnabled(False)
+        if save:
+            QMessageBox.about(self, '미리미림', '저장 성공!')
+        else:
+            QMessageBox.critical(self, '미리미림', '저장 실패! 관리자에게 문의하세요.')
+
     def set_setting_btn(self) :
         self.darkmode.setChecked(self.my.settings['dark'])
         self.alarm.setChecked(self.my.settings['alarm'])
         self.background.setChecked(self.my.settings['background'])
+        self.btnSettingSave.setEnabled(False)
 
     def set_default(self):
         default = QMessageBox.warning(self, '미리미림', '정말 기본값으로 하시겠습니까?', QMessageBox.Yes | QMessageBox.No)
         if default == QMessageBox.Yes:
+            self.btnSettingSave.setEnabled(False)
             settings = {
             'dark' : False,
             'alarm' : True,
             'background' : True
             }
 
-            self.my.setSettings(settings)
             save = settingSave(settings)
             self.set_setting_btn()
 
@@ -133,7 +188,6 @@ class MainWindowClass(QMainWindow, mainUi) :
             'background': self.background.isChecked()
         }
 
-        self.my.setSettings(settings)
         save = settingSave(settings)
 
         if save:
@@ -245,8 +299,7 @@ class MainWindowClass(QMainWindow, mainUi) :
                     if retry == QMessageBox.Yes:
                         return False
                 for item in data:
-                    subject = item[1:-1]
-                    self.my.timeTable[j][i] = subject
+                    self.my.timeTable[j][i] = item
                     j += 1
             except Exception as e:
                 print(e)
@@ -269,6 +322,7 @@ class MainWindowClass(QMainWindow, mainUi) :
             print(f"시간표 출력중 에러 발생 : {e}")
 
     def alarm_function(self, interval_seconds, icon_path):
+
         today = datetime.today().weekday()
         workTimes = self.my.getworkTimes()
         row = 0
@@ -305,7 +359,7 @@ class MainWindowClass(QMainWindow, mainUi) :
 
                 if current_time > parsed_time:
                     next = self.my.timeTable[row][column]
-                    if "*" in next or "프로그래밍" in next:
+                    if "*" in next:
                         subject = f"전공 수업인 {next}"
                     elif "체육" in next or "운동" in next:
                         subject = f"신나는 {next}"

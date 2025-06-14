@@ -16,6 +16,7 @@ def myinfoSave(userName, userGrade, userClass):
     f = open(user_path+'myInfo.json', 'w')
     f.write(json.dumps(myInfo))
     f.close()
+    return True
 
 def myinfoLoad():
     f = open(user_path+'myInfo.json', 'r')

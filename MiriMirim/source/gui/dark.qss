@@ -113,6 +113,11 @@ QPushButton#btnSettingDefault:hover, QPushButton#btnSettingSave:hover {
     border-radius: 10px;
 }
 
+QPushButton#btnSettingSave:disabled, QPushButton#btnSettingDefault:disabled {
+    background-color: #666666; /* 더 밝은 회색 배경 */
+    color: #a0a0a0; /* 연한 회색 글씨 */
+}
+
 QCheckBox#alarm::indicator:checked,
 QCheckBox#background::indicator:checked,
 QCheckBox#darkmode::indicator:checked {
@@ -122,10 +127,10 @@ QCheckBox#darkmode::indicator:checked {
 QWidget#myinfoTitle {
     background-color: #222222;
     border: 1.5px solid #dddddd;
-    border-radius: 15px;
+    border-radius: 20px;
 }
 
-QLabel#labelMy {
+QLabel#myLabel {
     color: white;
 }
 
@@ -135,18 +140,37 @@ QGroupBox#classGroup, QGroupBox#gradeGroup {
 
 QComboBox#gradeCombo, QComboBox#classCombo {
     color:white;
-    background-color: #333333;
+    background-color: #555555;
+    border: 3px solid #08F28C;
 }
 
-QPushButton#btnSaveMyinfo, QPushButton#btnCancelMyinfo {
+QPushButton#btnSaveMyinfo, QPushButton#btnCancelMyinfo, QPushButton#btnEditMyinfo {
     border: 1px solid #dddddd;
     background-color: #222222;
     border-radius: 10px;
     color: white;
 }
 
-QPushButton#btnSaveMyinfo:hover, QPushButton#btnCancelMyinfo:hover {
+QPushButton#btnSaveMyinfo:hover, QPushButton#btnCancelMyinfo:hover, QPushButton#btnEditMyinfo:hover {
     border: 1px solid #dddddd;
     background-color: #444444;
     border-radius: 10px;
+}
+
+QPushButton#btnSaveMyinfo:disabled,
+QPushButton#btnCancelMyinfo:disabled,
+QPushButton#btnEditMyinfo:disabled {
+    color: #a0a0a0;
+    background-color: #555555;
+    border-radius: 10px;
+}
+
+QLabel#infoLabel {
+    color: white;
+}
+
+QComboBox#gradeCombo:disabled, QComboBox#classCombo:disabled{
+    border: 1px dashed #08F28C;
+    background-color: #666666; /* 더 밝은 회색 배경 */
+    color: #a0a0a0; /* 연한 회색 글씨 */
 }
