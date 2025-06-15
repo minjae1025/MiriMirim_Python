@@ -93,12 +93,6 @@ QCheckBox#background::indicator:unchecked,
 QCheckBox#darkmode::indicator:unchecked {
 }
 
-QCheckBox#alarm::indicator:checked,
-QCheckBox#background::indicator:checked,
-QCheckBox#darkmode::indicator:checked {
-	image: url(source/img/check.png);
-}
-
 QWidget#myinfoTitle {
     background-color: white;
     border: 1.5px solid black;

@@ -16,10 +16,23 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.setWindowIcon(QIcon(image_path))
         self.setFixedSize(1600, 900)
 
-        if (self.my.settings['background']):
+        normalized_image_dir = os.path.normpath(img_path).replace(os.sep, '/')
+        if not normalized_image_dir.endswith('/'):
+            normalized_image_dir += '/'
+
+        qss_image_url = f"{normalized_image_dir}check.png"
+        qss_unimage_url = f"{normalized_image_dir}uncheck.png"
+        self.checkbox_qss = f"""
+            QCheckBox::indicator:checked {{
+                background: #08F28C;
+            }}
+        """
+        print(self.checkbox_qss)
+
+        if self.my.settings['background']:
             self.setup_tray_icon()
 
-        if (self.my.settings['alarm']):
+        if self.my.settings['alarm']:
             alarm_interval = 10
             alarm_thread = threading.Thread(target=self.alarm_function, args=(alarm_interval, notification_icon_path,),daemon=True)
             alarm_thread.start()
@@ -43,15 +56,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnSettingSave.clicked.connect(self.apply_setting)
         self.btnSettingDefault.clicked.connect(self.set_default)
 
-        if (self.my.settings['dark']):
-            pixmap = QPixmap(img_path+'dark_side_logo.png')
-            self.sideLogo.setPixmap(pixmap)
-            self.apply_stylesheet("dark.qss")
-        else:
-            pixmap = QPixmap(img_path+'light_side_logo.png')
-            self.sideLogo.setPixmap(pixmap)
-            self.apply_stylesheet("light.qss")
-
+        self.apply_theme()
         self.set_setting_btn()
 
         self.darkmode.setTristate(False)
@@ -136,11 +141,26 @@ class MainWindowClass(QMainWindow, mainUi) :
 
             save = settingSave(settings)
             self.set_setting_btn()
+            self.apply_theme(self)
 
             if save:
                 QMessageBox.about(self, '미리미림', '기본값으로 저장 성공!')
             else:
                 QMessageBox.critical(self, '미리미림', '기본값으로 저장 실패! 관리자에게 문의하세요.')
+
+    def apply_theme(self):
+        if self.my.settings['dark']:
+            print('다크모드 적용됨')
+            pixmap = QPixmap(img_path + 'dark_side_logo.png')
+            self.sideLogo.setPixmap(pixmap)
+            final_qss = self.apply_stylesheet_from_file("dark.qss")  # 변경된 부분
+            self.centralwidget.setStyleSheet(final_qss)
+        else:
+            print('라이트모드 적용됨')
+            pixmap = QPixmap(img_path + 'light_side_logo.png')
+            self.sideLogo.setPixmap(pixmap)
+            final_qss = self.apply_stylesheet_from_file("light.qss")  # 변경된 부분
+            self.centralwidget.setStyleSheet(final_qss)
 
 
     def apply_setting(self):
@@ -152,32 +172,40 @@ class MainWindowClass(QMainWindow, mainUi) :
 
         save = settingSave(settings)
         self.my.settings['dark'] = settings['dark']
-        if self.my.settings['dark']:
-            print('다크모드 적용됨')
-            pixmap = QPixmap(img_path + 'dark_side_logo.png')
-            self.sideLogo.setPixmap(pixmap)
-            self.apply_stylesheet("dark.qss")
-        else:
-            print('라이트모드 적용됨')
-            pixmap = QPixmap(img_path + 'light_side_logo.png')
-            self.sideLogo.setPixmap(pixmap)
-            self.apply_stylesheet("light.qss")
+        self.apply_theme()
+        print(settings)
 
         if save:
             QMessageBox.about(self, '미리미림', '설정 저장 성공!')
         else:
             QMessageBox.critical(self, '미리미림', '설정 저장 실패! 관리자에게 문의하세요.')
 
-    def apply_stylesheet(self, filename):
-        path = os.path.join(bundle_dir, 'source/gui/')
-        file = QFile(path+filename)
+    def apply_stylesheet_from_file(self, filename):
+        path_to_qss_dir = os.path.join(bundle_dir, 'source', 'gui')
+        qss_file_full_path = os.path.join(path_to_qss_dir, filename)
+
+        file = QFile(qss_file_full_path)
+
+        print(f"\n--- QSS 파일 로드 디버그 ---")
+        print(f"시도하는 QSS 파일 경로: {qss_file_full_path}")
+
+        # 파일 열기 시도 및 성공 여부 확인
         if not file.open(QFile.ReadOnly | QFile.Text):
-            print(f"Error: Could not open stylesheet file: {filename}")
-            return
+            print(f"오류: QSS 파일 '{qss_file_full_path}'을(를) 열 수 없습니다.")
+            print(f"파일이 해당 경로에 존재하는지, 읽기 권한이 있는지 확인하세요.")
+            # 파일을 로드하지 못했으므로 기본 체크박스 QSS만 반환하거나, 빈 문자열 반환 등 처리
+            return self.checkbox_qss  # 파일 로드 실패 시 체크박스 QSS만 적용하도록 폴백
+        else:
+            print(f"QSS 파일 '{qss_file_full_path}'을(를) 성공적으로 열었습니다.")
+
         stream = QTextStream(file)
-        stylesheet = stream.readAll()
-        self.centralwidget.setStyleSheet(stylesheet)  # QApplication에 스타일 시트 적용
+        base_stylesheet = stream.readAll()
         file.close()
+
+        # 기존 파일 QSS에 QCheckBox 인디케이터 QSS 조각을 합칩니다.
+        total_stylesheet = base_stylesheet + "\n" + self.checkbox_qss
+
+        return total_stylesheet
 
     def update_data(self, item: QTableWidgetItem):
         row = item.row()

@@ -120,12 +120,6 @@ QPushButton#btnSettingSave:disabled, QPushButton#btnSettingDefault:disabled {
     color: #a0a0a0; /* 연한 회색 글씨 */
 }
 
-QCheckBox#alarm::indicator:checked,
-QCheckBox#background::indicator:checked,
-QCheckBox#darkmode::indicator:checked {
-	image: url(source/img/check.png);
-}
-
 QWidget#myinfoTitle {
     background-color: #222222;
     border: 1.5px solid #dddddd;

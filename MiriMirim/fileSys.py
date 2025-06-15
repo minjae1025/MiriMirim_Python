@@ -13,7 +13,7 @@ else:
 
 user_path = os.path.join(bundle_dir, 'source/user/')
 img_path = os.path.join(bundle_dir, 'source/img/')
-gui_path = os.path.join(bundle_dir, 'source/gui')
+gui_path = os.path.join(bundle_dir, 'source/gui/')
 
 image_path = os.path.join(bundle_dir, img_path, 'miri_mirim.ico')
 notification_icon_path = image_path

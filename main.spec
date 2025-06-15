@@ -1,6 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_submodules
 
+import os
+
 hiddenimports = []
 hiddenimports += collect_submodules('plyer')
 
@@ -23,7 +25,16 @@ a = Analysis(
     codesign_identity=None,
     entitlements_file=None,
 )
+
+folder_to_exclude = os.path.join('source', 'user')
+
+a.datas = [
+    item for item in a.datas
+    if not item[0].startswith(folder_to_exclude)
+]
+
 pyz = PYZ(a.pure)
+
 
 exe = EXE(
     pyz,
@@ -34,7 +45,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=False,
+    upx=True,
     upx_exclude=['_uuid.pyd', 'python3.dll'],
     console=True,
     disable_windowed_traceback=False,
