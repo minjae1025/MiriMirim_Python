@@ -85,39 +85,62 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnCancelMyinfo.setEnabled(False)
         self.btnCancelMyinfo.clicked.connect(self.cancel_myinfo)
 
+
     def change_value(self):
         self.btnSettingSave.setEnabled(True)
 
     def cancel_myinfo(self):
-        self.gradeCombo.setCurrentIndex(self.my.getmyGrade() - 1)
-        self.classCombo.setCurrentIndex(self.my.getmyClass() - 1)
+        self.btnCancelMyinfo.setEnabled(False)
+        self.btnSaveMyinfo.setEnabled(False)
+        # self.gradeCombo.setCurrentIndex(self.my.myGrade - 1)
+        # self.classCombo.setCurrentIndex(self.my.myClass - 1)
+        # target_grade_index = self.my.getmyGrade() - 1
+        # if 0 <= target_grade_index < self.gradeCombo.count():
+        #     self.gradeCombo.setCurrentIndex(target_grade_index)
+        # else:
+        #     print(
+        #         f"경고: gradeCombo의 인덱스 오류. my.myGrade: {self.my.getmyGrade()}, 유효한 인덱스 범위: 0 ~ {self.gradeCombo.count() - 1}")
+        #     # 오류가 발생했을 때 기본값(첫 번째 아이템)을 선택하거나, 사용자에게 알리는 등의 추가 처리를 할 수 있습니다.
+        #     if self.gradeCombo.count() > 0:
+        #         self.gradeCombo.setCurrentIndex(0)  # 기본값으로 첫 번째 아이템 선택
+        #
+        # # Class Combo Box 설정
+        # target_class_index = self.my.getmyClass() - 1
+        # if 0 <= target_class_index < self.classCombo.count():
+        #     self.classCombo.setCurrentIndex(target_class_index)
+        # else:
+        #     print(
+        #         f"경고: classCombo의 인덱스 오류. my.myClass: {self.my.getmyClass()}, 유효한 인덱스 범위: 0 ~ {self.classCombo.count() - 1}")
+        #     if self.classCombo.count() > 0:
+        #         self.classCombo.setCurrentIndex(0)  # 기본값으로 첫 번째 아이템 선택
         self.gradeCombo.setEnabled(False)
         self.classCombo.setEnabled(False)
-        self.btnSaveMyinfo.setEnabled(False)
         self.btnEditMyinfo.setEnabled(True)
-        self.btnCancelMyinfo.setEnabled(False)
 
     def edit_myinfo(self):
+        self.btnEditMyinfo.setEnabled(False)
         self.gradeCombo.setEnabled(True)
         self.classCombo.setEnabled(True)
         self.btnSaveMyinfo.setEnabled(True)
-        self.btnEditMyinfo.setEnabled(False)
         self.btnCancelMyinfo.setEnabled(True)
 
     def set_myinfo(self):
         userGrade = self.gradeCombo.currentText()
         userClass = self.classCombo.currentText()
-        print(userGrade, userClass)
-        save = myinfoSave(self.my.Name, userGrade, userClass)
-        self.my.myGrade = userGrade
-        self.my.myClass = userClass
 
-        self.try_timetable_request()
         self.gradeCombo.setEnabled(False)
         self.classCombo.setEnabled(False)
         self.btnSaveMyinfo.setEnabled(False)
         self.btnEditMyinfo.setEnabled(True)
         self.btnCancelMyinfo.setEnabled(False)
+        if userGrade == self.my.myGrade and userClass == self.my.myClass:
+            QMessageBox.about(self, '미리미림', '변경사항이 없습니다!')
+            return
+
+        save = myinfoSave(self.my.Name, userGrade, userClass)
+        self.my.myGrade = userGrade
+        self.my.myClass = userClass
+        self.try_timetable_request()
         if save:
             QMessageBox.about(self, '미리미림', '저장 성공!')
         else:
@@ -130,6 +153,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnSettingSave.setEnabled(False)
 
     def set_default(self):
+        self.btnSettingDefault.setEnabled(False)
         default = QMessageBox.warning(self, '미리미림', '정말 기본값으로 하시겠습니까?', QMessageBox.Yes | QMessageBox.No)
         if default == QMessageBox.Yes:
             self.btnSettingSave.setEnabled(False)
@@ -141,12 +165,14 @@ class MainWindowClass(QMainWindow, mainUi) :
 
             save = settingSave(settings)
             self.set_setting_btn()
-            self.apply_theme(self)
+            self.apply_theme()
 
             if save:
                 QMessageBox.about(self, '미리미림', '기본값으로 저장 성공!')
             else:
                 QMessageBox.critical(self, '미리미림', '기본값으로 저장 실패! 관리자에게 문의하세요.')
+        self.btnSettingDefault.setEnabled(True)
+
 
     def apply_theme(self):
         if self.my.settings['dark']:
@@ -317,7 +343,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         workTimes = self.my.getworkTimes()
         row = 0
         nextTimeIdx = 0
-        current_time = datetime.now().time()
+        now_time = datetime.now().time()
         notification.notify(
             title='미리미림',
             message=str(f"오늘은 {self.my.weekdays[today]}요일 입니다!"),
@@ -334,7 +360,7 @@ class MainWindowClass(QMainWindow, mainUi) :
             length = 8
 
         for item in workTimes:
-            if datetime.strptime(item, "%H:%M").time() < current_time:
+            if datetime.strptime(item, "%H:%M").time() < now_time:
                 nextTimeIdx += 1
                 row += 1
 

@@ -36,7 +36,7 @@ class DataWorker(QThread):
         if self.running: # 스레드가 종료되지 않았을 경우에만 시그널 방출
             self.data_loaded.emit(timeTable) # 데이터와 함께 시그널 방출
             self.loading_finished.emit() # 로딩 완료 시그널 방출
+        return None
 
     def stop(self):
         self.running = False
-        self.wait() # 스레드 종료를 기다림

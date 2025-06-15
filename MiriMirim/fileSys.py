@@ -1,7 +1,7 @@
 import json, sys, os
 from PIL import Image
 from PyQt5 import uic
-from PyQt5.QtCore import Qt, QCoreApplication, QFile, QTextStream, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QCoreApplication, QFile, QTextStream, QThread, pyqtSignal, QTimer
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
