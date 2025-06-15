@@ -7,8 +7,7 @@
 3. PyCharm 2025.x 이상
 
 ### 필요한 라이브러리
-1. player
-2. pystray
-4. requests
-5. screeninfo
-7. pyqt5
+1. playr
+2. requests
+3. screeninfo
+4. pyqt5
