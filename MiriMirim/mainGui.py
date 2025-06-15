@@ -1,52 +1,11 @@
-import sys, os, threading, time
-from datetime import datetime, timedelta
-from PIL import Image
-from PyQt5 import uic
-from PyQt5.QtCore import Qt, QCoreApplication, QFile, QTextStream
+import threading, random, time
+from requsetWork import *
 from fileSys import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from requestApi import requestApi
 from Account import Account
 from plyer import notification
 from datetime import datetime
 tray_icon = None
-
-img_path = 'source/img'
-gui_path = 'source/gui'
-
-image_path = os.path.join(bundle_dir, img_path, 'miri_mirim.ico')
-notification_icon_path = image_path
-image = Image.open(image_path)
-
-#UI파일 연결
-#os.path.join(bundle_dir, '../gui', 'firstWindow.ui')
-firstUi = uic.loadUiType(os.path.join(bundle_dir, gui_path, 'firstWindow.ui'))[0]
-mainUi = uic.loadUiType(os.path.join(bundle_dir, gui_path, 'mainWindow.ui'))[0]
-
-#화면을 띄우는데 사용되는 Class 선언
-class firstWindowClass(QMainWindow, firstUi) :
-    def __init__(self) :
-        super().__init__()
-        self.setupUi(self)
-        self.setWindowTitle('미리미림')
-        self.setWindowIcon(QIcon(image_path))
-        self.setFixedSize(1600, 900)
-
-    def start(self) :
-        userName = self.nameText.text()
-        userGrade = self.gradeCombo.currentText()
-        userClass = self.classCombo.currentText()
-
-        if userName == '' :
-            QMessageBox.warning(self, '미리미림', '이름을 입력해주세요!')
-            return
-        if userGrade == '학년' or userClass == '반':
-            QMessageBox.warning(self, '미리미림', '학년과 반을 선택해 주세요')
-            return
-
-        myinfoSave(userName, userGrade, userClass)
-        self.close()
+goodPhrase = ['좋은', '즐거운', '행복한', '신나는']
 
 class MainWindowClass(QMainWindow, mainUi) :
     def __init__(self, myInfo, settings) :
@@ -65,6 +24,9 @@ class MainWindowClass(QMainWindow, mainUi) :
             alarm_thread = threading.Thread(target=self.alarm_function, args=(alarm_interval, notification_icon_path,),daemon=True)
             alarm_thread.start()
 
+        self.worker_thread = None
+        self.try_timetable_request()
+
         self.button_group = QButtonGroup(self)
         self.button_group.addButton(self.btnMain)
         self.button_group.addButton(self.btnSetting)
@@ -81,7 +43,6 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnSettingSave.clicked.connect(self.apply_setting)
         self.btnSettingDefault.clicked.connect(self.set_default)
 
-        img_path = os.path.join(bundle_dir, 'source/img/')
         if (self.my.settings['dark']):
             pixmap = QPixmap(img_path+'dark_side_logo.png')
             self.sideLogo.setPixmap(pixmap)
@@ -112,7 +73,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.classCombo.setEnabled(False)
         self.btnCancelMyinfo.setEnabled(False)
 
-        self.myLabel.setText(f"안녕하세요 {self.my.Name}님! 좋은 {self.my.weekdays[datetime.today().weekday()]}요일 보내세요!")
+        self.myLabel.setText(f"안녕하세요 {self.my.Name}님!\n {random.choice(goodPhrase)} {self.my.weekdays[datetime.today().weekday()]}요일 보내세요!")
         self.btnSaveMyinfo.clicked.connect(self.set_myinfo)
         self.btnSaveMyinfo.setEnabled(False)
         self.btnEditMyinfo.clicked.connect(self.edit_myinfo)
@@ -141,9 +102,10 @@ class MainWindowClass(QMainWindow, mainUi) :
     def set_myinfo(self):
         userGrade = self.gradeCombo.currentText()
         userClass = self.classCombo.currentText()
+        print(userGrade, userClass)
         save = myinfoSave(self.my.Name, userGrade, userClass)
-        self.my.userGrade = userGrade
-        self.my.userClass = userClass
+        self.my.myGrade = userGrade
+        self.my.myClass = userClass
 
         self.try_timetable_request()
         self.gradeCombo.setEnabled(False)
@@ -189,6 +151,17 @@ class MainWindowClass(QMainWindow, mainUi) :
         }
 
         save = settingSave(settings)
+        self.my.settings['dark'] = settings['dark']
+        if self.my.settings['dark']:
+            print('다크모드 적용됨')
+            pixmap = QPixmap(img_path + 'dark_side_logo.png')
+            self.sideLogo.setPixmap(pixmap)
+            self.apply_stylesheet("dark.qss")
+        else:
+            print('라이트모드 적용됨')
+            pixmap = QPixmap(img_path + 'light_side_logo.png')
+            self.sideLogo.setPixmap(pixmap)
+            self.apply_stylesheet("light.qss")
 
         if save:
             QMessageBox.about(self, '미리미림', '설정 저장 성공!')
@@ -215,9 +188,9 @@ class MainWindowClass(QMainWindow, mainUi) :
         if 0 <= row < len(self.my.timeTable) and 0 <= col < len(self.my.timeTable[row]):
             # 파이썬 배열 업데이트
             self.my.timeTable[row][col] = new_value
-            print(f"데이터 업데이트: timetable[{row}][{col}] = '{self.my.timeTable[row][col]}'")
+            # print(f"데이터 업데이트: timetable[{row}][{col}] = '{self.my.timeTable[row][col]}'")
         else:
-            print(f"Error: Row {row}, Col {col} out of bounds for data array.")
+            QMessageBox.critical(self, '미리미림', '오류! 시간표 수정 실패')
 
     # 창을 보여주는 함수
     def show_window(self):
@@ -287,30 +260,19 @@ class MainWindowClass(QMainWindow, mainUi) :
             self.show_window()
 
     def try_timetable_request(self):
-        today = datetime.today()
-        for i in range(0, 5):
-            day = today + timedelta(days=-today.weekday() + i)
-            j = 0
-            try:
-                data = requestApi(day, self.my.myGrade, self.my.myClass, )
-                if data == "error":
-                    retry = QMessageBox.critical(self, '인터넷 오류!', '인터넷이 오류로 인한 프로그램 실행에 실패했습니다. 재시도 하시겠습니까?',
-                                                 QMessageBox.YES | QMessageBox.NO)
-                    if retry == QMessageBox.Yes:
-                        return False
-                for item in data:
-                    self.my.timeTable[j][i] = item
-                    j += 1
-            except Exception as e:
-                print(e)
-        return True
+        if self.worker_thread and self.worker_thread.isRunning():
+            print("이전 스레드가 아직 실행 중입니다. 중지 후 재시작합니다.")
+            self.worker_thread.stop()  # 이전 스레드를 안전하게 중지
 
-    def show_timetable(self):
+        # print(f"새로운 데이터 로딩 시작 요청: 파라미터 = {self.my.getmyGrade()}, {self.my.getmyClass()}")
+        self.worker_thread = None
+        self.worker_thread = DataWorker(self.my.getmyGrade(), self.my.getmyClass())
+        self.worker_thread.data_loaded.connect(self.show_timetable)
+        self.worker_thread.start()
+
+    def show_timetable(self, received_data):
+        self.my.timeTable = received_data
         table_widget = self.timetable
-        while True:
-            if self.try_timetable_request():
-                break
-
         try:
             for row_idx, row_data in enumerate(self.my.timeTable):
                 for col_idx, item_data in enumerate(row_data):
@@ -319,7 +281,7 @@ class MainWindowClass(QMainWindow, mainUi) :
                         table_widget.setItem(row_idx, col_idx, item)  # 테이블에 아이템 설정
 
         except Exception as e:
-            print(f"시간표 출력중 에러 발생 : {e}")
+            QMessageBox.critical(self, '미리미림', '시간표 출력중 에러가 발생했습니다. 관리자에게 문의하세요.')
 
     def alarm_function(self, interval_seconds, icon_path):
 

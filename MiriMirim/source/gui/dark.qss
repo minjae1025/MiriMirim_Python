@@ -32,6 +32,7 @@ QTabWidget::pane {
 }
 
 QTableWidget {
+    font-family: "Noto Sans KR";
 	border: 3px solid #dddddd;
 	border-radius: 5px;
 }
@@ -51,6 +52,7 @@ QTableWidget::item {
 	border: 1px solid #dddddd;
 	background-color: #222222;
 	color: white;
+	padding: 1px;
 }
 
 QTableWidget::item:selected{
@@ -134,16 +136,6 @@ QLabel#myLabel {
     color: white;
 }
 
-QGroupBox#classGroup, QGroupBox#gradeGroup {
-    color: white;
-}
-
-QComboBox#gradeCombo, QComboBox#classCombo {
-    color:white;
-    background-color: #555555;
-    border: 3px solid #08F28C;
-}
-
 QPushButton#btnSaveMyinfo, QPushButton#btnCancelMyinfo, QPushButton#btnEditMyinfo {
     border: 1px solid #dddddd;
     background-color: #222222;
@@ -169,8 +161,35 @@ QLabel#infoLabel {
     color: white;
 }
 
+QGroupBox#classGroup, QGroupBox#gradeGroup {
+    color: white;
+}
+
+QComboBox#gradeCombo, QComboBox#classCombo {
+    color:white;
+    background-color: #444444;
+    border: 3px solid #08F28C;
+}
+
 QComboBox#gradeCombo:disabled, QComboBox#classCombo:disabled{
-    border: 1px dashed #08F28C;
-    background-color: #666666; /* 더 밝은 회색 배경 */
-    color: #a0a0a0; /* 연한 회색 글씨 */
+    border: 2px solid #08F28C;
+    background-color: #666666;
+    color: #a0a0a0;
+}
+
+/* 드롭다운 메뉴 (QAbstractItemView) 스타일 */
+QComboBox#gradeCombo QAbstractItemView, QComboBox#classCombo QAbstractItemView{
+    border: 1.5px solid #08F28C;
+    selection-background-color: #333333; /* 선택된 항목의 배경색 */
+    selection-color: white; /* 선택된 항목의 텍스트 색상 */
+    background-color: #444444; /* 드롭다운 메뉴 전체의 배경색 */
+    color: white; /* 드롭다운 메뉴 항목의 기본 텍스트 색상 */
+}
+
+/* 드롭다운 메뉴의 각 항목 스타일 (호버 시) */
+QComboBox#gradeCombo QAbstractItemView::item:hover,
+QComboBox#classCombo QAbstractItemView::item:hover
+{
+    background-color: #555555;
+    color: white;
 }
