@@ -25,3 +25,6 @@ class firstWindowClass(QMainWindow, firstUi) :
 
         myinfoSave(userName, userGrade, userClass)
         self.close()
+
+    def closeEvent(self, closeEvent):
+        exit(1)
