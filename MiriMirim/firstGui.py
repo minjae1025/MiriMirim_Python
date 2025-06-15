@@ -2,7 +2,7 @@ from fileSys import *
 tray_icon = None
 
 #화면을 띄우는데 사용되는 Class 선언
-class firstWindowClass(QMainWindow, firstUi) :
+class firstWindowClass(QDialog, firstUi) :
     def __init__(self) :
         super().__init__()
 
@@ -24,8 +24,17 @@ class firstWindowClass(QMainWindow, firstUi) :
             return
 
         myinfoSave(userName, userGrade, userClass)
-        self.close()
+        self.accept()
 
     def closeEvent(self, closeEvent):
-        QApplication.instance().quit()
-        closeEvent.accept()
+        reply = QMessageBox.question(self, '미리미림',
+                                     "정말 종료하시겠습니까?",
+                                     QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            closeEvent.accept()  # 종료 이벤트 수락
+            # QDialog의 경우, reject()를 호출하여 exec()가 QDialog.Rejected를 반환하도록 함
+            self.reject()
+        else:
+            closeEvent.ignore()

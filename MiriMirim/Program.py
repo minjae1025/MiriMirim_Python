@@ -12,8 +12,13 @@ def first_start():
     #프로그램 화면을 보여주는 코드
     firstWindow.show()
 
-    #프로그램을 이벤트루프로 진입시키는 코드
-    app.exec()
+    result = firstWindow.exec_()
+    app.quit()
+
+    if result == QDialog.Accepted:
+        return True
+    else:
+        return False
 
 def main_start(myInfo, sttrings):
     app = QApplication(sys.argv)

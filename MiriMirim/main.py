@@ -10,9 +10,10 @@ if __name__ == "__main__":
     if not os.path.isdir(userInfoPath):
         os.mkdir(userInfoPath)
 
-    if os.path.isfile(userInfoPath + "/myInfo.json"):
+    is_setup_successful = first_start()  # first_start가 성공 여부를 반환한다고 가정
+    if is_setup_successful:
         programLoad()
     else:
-        first_start()
-        programLoad()
+        print("초기 설정이 완료되지 않았습니다. 프로그램을 종료합니다.")
+        sys.exit()
 
