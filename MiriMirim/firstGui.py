@@ -27,4 +27,12 @@ class firstWindowClass(QMainWindow, firstUi) :
         self.close()
 
     def closeEvent(self, closeEvent):
-        exit(1)
+        reply = QMessageBox.question(self, '미리미림',
+                                     "정말 프로그램을 종료하시겠습니까?", QMessageBox.Yes |
+                                     QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+           closeEvent.accept() # 이벤트를 수락하여 종료를 진행
+           sys.exit(0) # 애플리케이션 종료 (성공 코드 0)
+        else:
+           closeEvent.ignore() # 이벤트를 무시하여 종료를 취소
