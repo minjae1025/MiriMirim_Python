@@ -24,10 +24,10 @@ def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
     api_url = (URL+"KEY="+API_KEY+"&ATPT_OFCDC_SC_CODE="+ATPT_OFCDC_SC_CODE+"&SD_SCHUL_CODE="+SD_SCHUL_CODE+"&AY="+AY+"&SEM="+SEM+"&ALL_TI_YMD="+ALL_TI_YMD+"&GRADE="+
                str(GRADE)+"&CLASS_NM="+str(CLASS_NM)+"&Type="+TYPE)
     subjects = []
+    print(api_url)
     try:
-        response = requests.get(api_url, timeout=3)
+        response = requests.get(api_url, timeout=10)
         data = response.json()
-        print(api_url)
         data = data["hisTimetable"][1]['row']
         i = 1
         for item in data:

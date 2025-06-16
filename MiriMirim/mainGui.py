@@ -15,6 +15,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.setWindowTitle('미리미림')
         self.setWindowIcon(QIcon(image_path))
         self.setFixedSize(1600, 900)
+        self.worker_thread = None
 
         normalized_image_dir = os.path.normpath(img_path).replace(os.sep, '/')
         if not normalized_image_dir.endswith('/'):
@@ -27,7 +28,7 @@ class MainWindowClass(QMainWindow, mainUi) :
                 background: #08F28C;
             }}
         """
-        print(self.checkbox_qss)
+        # print(self.checkbox_qss)
 
         if self.my.settings['background']:
             self.setup_tray_icon()
@@ -36,9 +37,6 @@ class MainWindowClass(QMainWindow, mainUi) :
             alarm_interval = 10
             alarm_thread = threading.Thread(target=self.alarm_function, args=(alarm_interval, notification_icon_path,),daemon=True)
             alarm_thread.start()
-
-        self.worker_thread = None
-        self.try_timetable_request()
 
         self.button_group = QButtonGroup(self)
         self.button_group.addButton(self.btnMain)
@@ -85,6 +83,8 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnCancelMyinfo.setEnabled(False)
         self.btnCancelMyinfo.clicked.connect(self.cancel_myinfo)
 
+        self.try_timetable_request()
+
 
     def change_value(self):
         self.btnSettingSave.setEnabled(True)
@@ -92,27 +92,8 @@ class MainWindowClass(QMainWindow, mainUi) :
     def cancel_myinfo(self):
         self.btnCancelMyinfo.setEnabled(False)
         self.btnSaveMyinfo.setEnabled(False)
-        # self.gradeCombo.setCurrentIndex(self.my.myGrade - 1)
-        # self.classCombo.setCurrentIndex(self.my.myClass - 1)
-        # target_grade_index = self.my.getmyGrade() - 1
-        # if 0 <= target_grade_index < self.gradeCombo.count():
-        #     self.gradeCombo.setCurrentIndex(target_grade_index)
-        # else:
-        #     print(
-        #         f"경고: gradeCombo의 인덱스 오류. my.myGrade: {self.my.getmyGrade()}, 유효한 인덱스 범위: 0 ~ {self.gradeCombo.count() - 1}")
-        #     # 오류가 발생했을 때 기본값(첫 번째 아이템)을 선택하거나, 사용자에게 알리는 등의 추가 처리를 할 수 있습니다.
-        #     if self.gradeCombo.count() > 0:
-        #         self.gradeCombo.setCurrentIndex(0)  # 기본값으로 첫 번째 아이템 선택
-        #
-        # # Class Combo Box 설정
-        # target_class_index = self.my.getmyClass() - 1
-        # if 0 <= target_class_index < self.classCombo.count():
-        #     self.classCombo.setCurrentIndex(target_class_index)
-        # else:
-        #     print(
-        #         f"경고: classCombo의 인덱스 오류. my.myClass: {self.my.getmyClass()}, 유효한 인덱스 범위: 0 ~ {self.classCombo.count() - 1}")
-        #     if self.classCombo.count() > 0:
-        #         self.classCombo.setCurrentIndex(0)  # 기본값으로 첫 번째 아이템 선택
+        self.gradeCombo.setCurrentIndex(int(self.my.myGrade) - 1)
+        self.classCombo.setCurrentIndex(int(self.my.myClass) - 1)
         self.gradeCombo.setEnabled(False)
         self.classCombo.setEnabled(False)
         self.btnEditMyinfo.setEnabled(True)
@@ -314,15 +295,48 @@ class MainWindowClass(QMainWindow, mainUi) :
             self.show_window()
 
     def try_timetable_request(self):
-        if self.worker_thread and self.worker_thread.isRunning():
+        if self.worker_thread is not None and self.worker_thread.isRunning():
             print("이전 스레드가 아직 실행 중입니다. 중지 후 재시작합니다.")
             self.worker_thread.stop()  # 이전 스레드를 안전하게 중지
+            self.worker_thread.quit()
+            self.worker_thread.wait(500)
 
-        # print(f"새로운 데이터 로딩 시작 요청: 파라미터 = {self.my.getmyGrade()}, {self.my.getmyClass()}")
-        self.worker_thread = None
-        self.worker_thread = DataWorker(self.my.getmyGrade(), self.my.getmyClass())
+        # new_worker = None  # 임시 변수 초기화
+        # try:
+        #     # Tip: 이 부분이 self.my.myClass가 맞는지 다시 확인해보세요.
+        #     new_worker = DataWorker(self.my.myGrade, self.my.myClass)
+        #     print("DataWorker 객체가 잘 생성되었습니다.")
+        # except Exception as e:
+        #     # 만약 DataWorker 클래스 자체를 만드는 데서 에러가 나면 여기서 출력됩니다.
+        #     print(f"CRITICAL: DataWorker 객체 생성 중 에러 발생: {e}")
+        #
+        # # 3. 객체가 성공적으로 생성되었는지 확인 후 다음 작업 진행
+        # if new_worker:
+        #     self.worker_thread = new_worker
+        #     print("DataWorker 객체가 잘 생성되었습니다.")
+        #     self.worker_thread.network_error.connect(self.handle_network_error)
+        #     self.worker_thread.data_loaded.connect(self.show_timetable)
+        #     self.worker_thread.start()  # 스레드 시작
+        # else:
+        #     # 4. 객체 생성에 실패한 경우 사용자에게 알림
+        #     print("ERROR: Worker 스레드 생성에 실패했습니다. DataWorker 클래스를 확인하세요.")
+        #     QMessageBox.critical(self, '미리미림', '데이터를 불러오는 작업을 시작하지 못했습니다.\nDataWorker 클래스 초기화 부분을 확인하세요.')
+
+        self.worker_thread = DataWorker(self.my.myGrade, self.my.myClass)
+        self.worker_thread.network_error.connect(self.handle_network_error)
         self.worker_thread.data_loaded.connect(self.show_timetable)
-        self.worker_thread.start()
+        #self.worker_thread.finished.connect(self.loading_complete)
+        self.worker_thread.start()  # 스레드 시작
+
+    def handle_network_error(self):
+        # --- 오류 발생 시 사용자에게 재시도 여부 묻기 ---
+        reply = QMessageBox.critical(self, '인터넷 오류!',
+                                     '인터넷 오류로 인한 프로그램 실행에 실패했습니다. 재시도 하시겠습니까?',
+                                     QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.try_timetable_request()
+        else:
+            QMessageBox.information(self, "취소", "데이터 로딩을 취소했습니다.")
 
     def show_timetable(self, received_data):
         self.my.timeTable = received_data
@@ -367,7 +381,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         while True:
             today = datetime.today().weekday()
             column = today
-            print(nextTimeIdx)
+            # print(nextTimeIdx)
             current_time = datetime.now().time()
             print(current_time)
             if nextTimeIdx < length:
