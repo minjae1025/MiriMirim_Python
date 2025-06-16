@@ -6,6 +6,8 @@ from plyer import notification
 from datetime import datetime
 tray_icon = None
 goodPhrase = ['좋은', '즐거운', '행복한', '신나는']
+majorSubjects = ['프로그래밍', '컴퓨터', '웹사이트', '네트워크', '서버', '데이터베이스', 'SQL', 'UI', '디자인', '광고', '그래픽', 'CG',
+                                 '색채', '비주얼', 'UX', '콘텐츠']
 
 class MainWindowClass(QMainWindow, mainUi) :
     def __init__(self, myInfo, settings) :
@@ -34,9 +36,13 @@ class MainWindowClass(QMainWindow, mainUi) :
             self.setup_tray_icon()
 
         if self.my.settings['alarm']:
-            alarm_interval = 10
+            alarm_interval = 1
             alarm_thread = threading.Thread(target=self.alarm_function, args=(alarm_interval, notification_icon_path,),daemon=True)
             alarm_thread.start()
+        else:
+            time_interval = 1
+            time_thread = threading.Thread(target=self.time_function, args=(time_interval,),daemon=True)
+            time_thread.start()
 
         self.button_group = QButtonGroup(self)
         self.button_group.addButton(self.btnMain)
@@ -84,6 +90,14 @@ class MainWindowClass(QMainWindow, mainUi) :
         self.btnCancelMyinfo.clicked.connect(self.cancel_myinfo)
 
         self.try_timetable_request()
+
+    def time_function(self, interval_seconds):
+        now = datetime.now()
+        while True:
+            self.timeLabel.setText(now.strftime("%H:%M:%S"))
+            now = datetime.now()
+            time.sleep(interval_seconds)
+
 
 
     def change_value(self):
@@ -222,6 +236,9 @@ class MainWindowClass(QMainWindow, mainUi) :
         # 데이터 배열의 유효성 검사 (인덱스 범위 확인)
         if 0 <= row < len(self.my.timeTable) and 0 <= col < len(self.my.timeTable[row]):
             # 파이썬 배열 업데이트
+            if any(sub_string in new_value for sub_string in majorSubjects):
+                if not '*' in new_value:
+                    new_value = '* ' + new_value
             self.my.timeTable[row][col] = new_value
             # print(f"데이터 업데이트: timetable[{row}][{col}] = '{self.my.timeTable[row][col]}'")
         else:
@@ -352,12 +369,12 @@ class MainWindowClass(QMainWindow, mainUi) :
             QMessageBox.critical(self, '미리미림', '시간표 출력중 에러가 발생했습니다. 관리자에게 문의하세요.')
 
     def alarm_function(self, interval_seconds, icon_path):
-
         today = datetime.today().weekday()
         workTimes = self.my.getworkTimes()
         row = 0
         nextTimeIdx = 0
         now_time = datetime.now().time()
+
         notification.notify(
             title='미리미림',
             message=str(f"오늘은 {self.my.weekdays[today]}요일 입니다!"),
@@ -379,11 +396,11 @@ class MainWindowClass(QMainWindow, mainUi) :
                 row += 1
 
         while True:
+            current_time = datetime.now().time()
+            self.timeLabel.setText(current_time.strftime("%H:%M:%S"))
             today = datetime.today().weekday()
             column = today
-            # print(nextTimeIdx)
-            current_time = datetime.now().time()
-            print(current_time)
+            # print(current_time)
             if nextTimeIdx < length:
                 parsed_time = datetime.strptime(workTimes[nextTimeIdx], "%H:%M").time()
 

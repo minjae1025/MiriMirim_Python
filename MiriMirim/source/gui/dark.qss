@@ -187,3 +187,7 @@ QComboBox#classCombo QAbstractItemView::item:hover
     background-color: #555555;
     color: white;
 }
+
+QLabel#timeLabel {
+    color: white;
+}
