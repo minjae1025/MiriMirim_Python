@@ -91,14 +91,21 @@ class MainWindowClass(QMainWindow, mainUi) :
 
         self.try_timetable_request()
 
+        self.btnLoad.clicked.connect(self.reload_timetable)
+
+    def reload_timetable(self):
+        check = QMessageBox.warning(self, "미리미림", "다시 불러오면 수정한 내용이 사라집니다. 정말 다시 불러오시겠습니까?", QMessageBox.Yes | QMessageBox.No)
+        if check == QMessageBox.Yes:
+            self.try_timetable_request()
+        else:
+            return
+
     def time_function(self, interval_seconds):
         now = datetime.now()
         while True:
             self.timeLabel.setText(now.strftime("%H:%M:%S"))
             now = datetime.now()
             time.sleep(interval_seconds)
-
-
 
     def change_value(self):
         self.btnSettingSave.setEnabled(True)
@@ -318,27 +325,6 @@ class MainWindowClass(QMainWindow, mainUi) :
             self.worker_thread.quit()
             self.worker_thread.wait(500)
 
-        # new_worker = None  # 임시 변수 초기화
-        # try:
-        #     # Tip: 이 부분이 self.my.myClass가 맞는지 다시 확인해보세요.
-        #     new_worker = DataWorker(self.my.myGrade, self.my.myClass)
-        #     print("DataWorker 객체가 잘 생성되었습니다.")
-        # except Exception as e:
-        #     # 만약 DataWorker 클래스 자체를 만드는 데서 에러가 나면 여기서 출력됩니다.
-        #     print(f"CRITICAL: DataWorker 객체 생성 중 에러 발생: {e}")
-        #
-        # # 3. 객체가 성공적으로 생성되었는지 확인 후 다음 작업 진행
-        # if new_worker:
-        #     self.worker_thread = new_worker
-        #     print("DataWorker 객체가 잘 생성되었습니다.")
-        #     self.worker_thread.network_error.connect(self.handle_network_error)
-        #     self.worker_thread.data_loaded.connect(self.show_timetable)
-        #     self.worker_thread.start()  # 스레드 시작
-        # else:
-        #     # 4. 객체 생성에 실패한 경우 사용자에게 알림
-        #     print("ERROR: Worker 스레드 생성에 실패했습니다. DataWorker 클래스를 확인하세요.")
-        #     QMessageBox.critical(self, '미리미림', '데이터를 불러오는 작업을 시작하지 못했습니다.\nDataWorker 클래스 초기화 부분을 확인하세요.')
-
         self.worker_thread = DataWorker(self.my.myGrade, self.my.myClass)
         self.worker_thread.network_error.connect(self.handle_network_error)
         self.worker_thread.data_loaded.connect(self.show_timetable)
@@ -374,6 +360,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         row = 0
         nextTimeIdx = 0
         now_time = datetime.now().time()
+        self.timeLabel.setText(now_time.strftime("%H:%M:%S"))
 
         notification.notify(
             title='미리미림',
@@ -386,7 +373,7 @@ class MainWindowClass(QMainWindow, mainUi) :
         if today == 0 or today == 4:
             length = 7
         elif today == 5 or today == 6:
-            return
+            length = 0
         else:
             length = 8
 
@@ -396,6 +383,7 @@ class MainWindowClass(QMainWindow, mainUi) :
                 row += 1
 
         while True:
+            # print("while문 실행중")
             current_time = datetime.now().time()
             self.timeLabel.setText(current_time.strftime("%H:%M:%S"))
             today = datetime.today().weekday()

@@ -41,7 +41,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Miri_Mirim',
+    name='MiriMirim',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -53,6 +53,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='MiriMirim/source/img/miri_mirim.ico'
 )
 coll = COLLECT(
     exe,

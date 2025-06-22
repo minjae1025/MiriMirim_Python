@@ -191,3 +191,15 @@ QComboBox#classCombo QAbstractItemView::item:hover
 QLabel#timeLabel {
     color: white;
 }
+
+QPushButton#btnLoad {
+     background-color: #222222;
+     border: none;
+     color: white;
+}
+
+QPushButton#btnLoad:hover {
+     background-color: #333333;
+     border: none;
+     color: white;
+}
