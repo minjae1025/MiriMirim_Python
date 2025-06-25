@@ -1,9 +1,11 @@
-import requests, json
+import requests, json, os
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
+from dotenv import load_dotenv
 
+load_dotenv()
 today = datetime.today()
-API_KEY = "90de860d4ab54f7eb75640bf431149a4"
+API_KEY = os.environ.get("API_KEY")
 URL = "https://open.neis.go.kr/hub/hisTimetable?"
 ATPT_OFCDC_SC_CODE = "B10"
 SD_SCHUL_CODE = "7011569"
@@ -31,7 +33,7 @@ def requestApi(ALL_TI_YMD, GRADE, CLASS_NM):
         data = data["hisTimetable"][1]['row']
         i = 1
         for item in data:
-            if day.weekday() == 4 and (i == 5 or i == 6):
+            if GRADE == '2' and day.weekday() == 4 and (i == 5 or i == 6):
                 temp = "선택 과목"
             else:
                 temp = json.dumps(item["ITRT_CNTNT"]).encode("utf8").decode('unicode_escape')[1:-1]
