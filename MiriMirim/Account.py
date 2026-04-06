@@ -5,7 +5,7 @@ class Account():
     myGrade = int
     myClass = int
     timeTable = [["" for _ in range(5)] for _ in range(7)]
-    workTimes = ["08:25", "09:25", "10:25", "11:25", "12:18", "13:15", "14:15", "15:15"]
+    workTimes = ["08:15", "09:15", "10:15", "11:15", "12:05", "12:55", "13:55", "14:55"]
     weekdays = ['월', '화', '수', '목', '금', '토', '일']
     setting = {
             'dark' : False,
