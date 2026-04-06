@@ -10,3 +10,4 @@
 1. playr
 2. requests
 3. pyqt5
+4. dotenv
