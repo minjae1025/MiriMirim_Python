@@ -27,22 +27,26 @@ def myinfoSave(userName, userGrade, userClass):
                'userGrade': userGrade,
                'userClass': userClass
                }
-    f = open(user_path+'myInfo.json', 'w')
-    f.write(json.dumps(myInfo))
-    f.close()
+    file_path = os.path.join(user_path, 'myInfo.json')
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(myInfo, f, ensure_ascii=False, indent=4)
     return True
 
 def myinfoLoad():
-    f = open(user_path+'myInfo.json', 'r')
-    myInfo = json.loads(f.read())
-    print(myInfo)
-    return myInfo
+    file_path = os.path.join(user_path, 'myInfo.json')
+    if not os.path.exists(file_path):
+        return None  # 파일이 없을 경우 예외 처리
+
+    with open(file_path, 'r', encoding='utf-8') as f:
+        myInfo = json.load(f)  # json.loads(f.read()) 보다 효율적
+        print(myInfo)
+        return myInfo
 
 def settingLoad():
     if os.path.isfile(user_path+'settings.json'):
-        f = open(user_path + 'settings.json', 'r')
-        settings = json.loads(f.read())
-        return settings
+        with open(user_path+'settings.json', 'r', encoding='utf-8') as f:
+            settings = json.load(f)
+            return settings
     else:
         return {
             'dark' : False,
@@ -51,7 +55,6 @@ def settingLoad():
         }
 
 def settingSave(settings):
-    f = open(user_path+'settings.json', 'w')
-    f.write(json.dumps(settings))
-    f.close()
+    with open(user_path + 'settings.json', 'w', encoding='utf-8') as f:
+        json.dump(settings, f, ensure_ascii=False, indent=4)
     return True
